@@ -1,4 +1,66 @@
 # CustomerSystemSpringBootRepo
+$.ajax({
+    type: "POST",
+    url: "/login",
+    data: JSON.stringify({ userId: "yourUserId", password: "yourPassword" }),
+    contentType: "application/json",
+    success: function(response) {
+        // Xử lý khi đăng nhập thành công
+        console.log(response);
+        // Chuyển hướng trang hoặc thực hiện các hành động khác
+    },
+    error: function(xhr, status, error) {
+        // Xử lý khi đăng nhập không thành công
+        var errorMessage = JSON.parse(xhr.responseText);
+        console.log(errorMessage);
+
+        // Hiển thị thông báo lỗi trên thẻ div có id là "errorContainer"
+        $("#errorContainer").text(errorMessage);
+
+        // Hoặc nếu bạn muốn thêm class để tùy chỉnh giao diện
+        // $("#errorContainer").addClass("error-style");
+        
+        // Hoặc có thể hiển thị thông báo lỗi trong một cửa sổ thông báo
+        // alert(errorMessage);
+        
+        // Thực hiện các hành động khác tùy vào yêu cầu của bạn
+    }
+});
+
+
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LoginController {
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        // Kiểm tra nếu userId hoặc password rỗng
+        if (loginRequest.getUserId().isEmpty()) {
+            return ResponseEntity.badRequest().body("Chưa nhập User ID");
+        }
+
+        if (loginRequest.getPassword().isEmpty()) {
+            return ResponseEntity.badRequest().body("Chưa nhập Password");
+        }
+
+        // Thực hiện kiểm tra đăng nhập
+        boolean loginSuccess = // logic kiểm tra đăng nhập;
+
+        if (loginSuccess) {
+            return ResponseEntity.ok("Đăng nhập thành công");
+        } else {
+            return ResponseEntity.status(401).body("Đăng nhập không thành công");
+        }
+    }
+}
+
+
+
 @PostMapping("/login")
 public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
     // Thực hiện xác thực người dùng
