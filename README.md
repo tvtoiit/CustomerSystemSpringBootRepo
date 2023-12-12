@@ -1,5 +1,32 @@
 # CustomerSystemSpringBootRepo
 
+<dependencies>
+    <!-- Spring Boot Starter Web (bao gồm Spring MVC và Tomcat) -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- Spring Boot Starter Tomcat (để sử dụng Tomcat như server) -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-tomcat</artifactId>
+        <scope>provided</scope>
+    </dependency>
+
+    <!-- Thư viện javax.servlet:jstl -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+    </dependency>
+</dependencies>
+
+
+
+
+
+
+
 
 <!-- Hibernate ORM -->
 <dependency>
