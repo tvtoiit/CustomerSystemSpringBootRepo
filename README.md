@@ -1,4 +1,21 @@
 # CustomerSystemSpringBootRepo
+@PostMapping("/login")
+public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+    // Thực hiện xác thực người dùng
+    // ...
+
+    if (isUserAuthenticated) {
+        // Đăng nhập thành công
+        return ResponseEntity.ok("success");
+    } else {
+        // Đăng nhập thất bại
+        return ResponseEntity.badRequest().build();
+    }
+}
+
+
+
+
 
 package com.example.CustomerSystemSpringboot.entitys;
 
