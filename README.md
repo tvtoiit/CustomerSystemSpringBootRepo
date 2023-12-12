@@ -1,4 +1,69 @@
 # CustomerSystemSpringBootRepo
+ <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+
+
+
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+public class LoginController {
+
+    @PostMapping("/login")
+    public ModelAndView login(
+            @RequestParam(name = "userId", required = false) String userId,
+            @RequestParam(name = "passWord", required = false) String passWord,
+            @ModelAttribute("errorModel") Model model, BindingResult bindingResult) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("Login");
+
+        // Kiểm tra và thêm lỗi vào BindingResult
+        if (userId == null || userId.isEmpty()) {
+            bindingResult.rejectValue("userId", "error.userId", "Chưa nhập userId");
+        }
+        if (passWord == null || passWord.isEmpty()) {
+            bindingResult.rejectValue("passWord", "error.passWord", "Chưa nhập password");
+        }
+
+        // Nếu có lỗi, trả về trang Login với thông báo lỗi
+        if (bindingResult.hasErrors()) {
+            modelAndView.addObject("errorModel", model);
+            return modelAndView;
+        }
+
+        // Tiếp tục xử lý nếu không có lỗi
+        MstUser result = loginRepository.findByUserIdAndPasswordAndDeleteYmdIsNull(userId, passWord);
+
+        if (result != null) {
+            modelAndView.setViewName("Search");
+        }
+        
+        return modelAndView;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <dependencies>
     <!-- Spring Boot Starter Web (bao gồm Spring MVC và Tomcat) -->
