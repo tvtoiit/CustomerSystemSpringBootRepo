@@ -1,4 +1,155 @@
 # CustomerSystemSpringBootRepo
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+public interface MstCustomerRepository extends JpaRepository<MstCustomer, Long> {
+
+    @Query("SELECT c FROM MstCustomer c WHERE c.deleteYmd IS NULL " +
+           "AND (:name IS NULL OR LOWER(c.customerName) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+           "AND (:sex IS NULL OR c.sex = :sex) " +
+           "AND (:birthdayFrom IS NULL OR c.birthday >= :birthdayFrom) " +
+           "AND (:birthdayTo IS NULL OR c.birthday <= :birthdayTo) " +
+           "ORDER BY c.customerId")
+    Page<MstCustomer> findCustomers(
+            @Param("name") String name,
+            @Param("sex") Integer sex,
+            @Param("birthdayFrom") LocalDate birthdayFrom,
+            @Param("birthdayTo") LocalDate birthdayTo,
+            Pageable pageable
+    );
+}
+
+
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MstCustomerService {
+
+    @Autowired
+    private MstCustomerRepository customerRepository;
+
+    public Page<MstCustomer> findCustomers(String name, Integer sex, LocalDate birthdayFrom, LocalDate birthdayTo, Pageable pageable) {
+        return customerRepository.findCustomers(name, sex, birthdayFrom, birthdayTo, pageable);
+    }
+}
+
+
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class CustomerController {
+
+    @Autowired
+    private MstCustomerService customerService;
+
+    @GetMapping("/search")
+    public String searchCustomers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer sex,
+            @RequestParam(required = false) LocalDate birthdayFrom,
+            @RequestParam(required = false) LocalDate birthdayTo,
+            Pageable pageable,
+            Model model
+    ) {
+        Page<MstCustomer> customers = customerService.findCustomers(name, sex, birthdayFrom, birthdayTo, pageable);
+        model.addAttribute("customers", customers);
+        return "customerList";
+    }
+}
+
+
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<html>
+<head>
+    <title>Customer List</title>
+</head>
+<body>
+    <h2>Customer List</h2>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Sex</th>
+                <th>Birthday</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="customer" items="${customers.content}">
+                <tr>
+                    <td>${customer.customerId}</td>
+                    <td>${customer.customerName}</td>
+                    <td>${customer.sex == 0 ? 'Male' : 'Female'}</td>
+                    <td>${customer.birthday}</td>
+                    <td>${customer.address}</td>
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+
+    <div>
+        <c:if test="${customers.totalPages > 1}">
+            <p>Page ${customers.number + 1} of ${customers.totalPages}</p>
+        </c:if>
+    </div>
+
+    <div>
+        <a href="<c:url value='/search'/>?page=1">First Page</a>
+        <c:if test="${!customers.first}">
+            <a href="<c:url value='/search'/>?page=${customers.previousPageable.pageNumber + 1}">Previous Page</a>
+        </c:if>
+        <c:if test="${!customers.last}">
+            <a href="<c:url value='/search'/>?page=${customers.nextPageable.pageNumber + 1}">Next Page</a>
+        </c:if>
+        <a href="<c:url value='/search'/>?page=${customers.totalPages}">Last Page</a>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $.ajax({
     type: "POST",
     url: "/login",
